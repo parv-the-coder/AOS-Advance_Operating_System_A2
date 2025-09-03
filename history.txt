@@ -1,0 +1,62 @@
+cd
+history
+history
+cd
+history
+echo hello
+history
+clear
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+sleep 100
+grep
+gedit
+gedit &
+which gedit
+gedit
+gedit
+gedit &
+sudo apt remove gedit
+sudo apt install gedit
+
+gedit
+date
+gedit
+gedit
+history
+ ls | grep “.txt” > out.txt; cat < in.txt | wc -l > lines.txt
+ ls | grep “.txt” > out.txt; cat < in.txt | wc -l > lines.txt
+history
+ ls | grep “.txt” > out.txt; cat < in.txt | wc -l > lines.txt
+cd ~
+cd ..
+cd
+cd ~
+cd -
+cd ..
+cd -
+cd testing/
+cd ..
+cd ..
+cd ..
+cd 
+/home/parv-shah/Mtech/AOS/Assignments/2025202019_A2/testing/
+cd /home/parv-shah/Mtech/AOS/Assignments/2025202019_A2/testing/
+clear
+cd ..
+cd /home/parv-shah/Mtech/AOS/Assignments/2025202019_A2/testing/
+cd /home/parv-shah/Mtech/AOS/Assignments/2025202019_A2/testing/sd
+cd ..
+clear
+cd
+clear
+cd /home/parv-shah/Mtech/AOS/Assignments/2025202019_A2/testing/sd
+cd -
+cd ~
