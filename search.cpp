@@ -1,96 +1,66 @@
 #include "header.h"
+#include <stack>
 
-// ---------------------------------------------------------------------
-// helper function: check if a string is "." or ".."
-// ---------------------------------------------------------------------
+// check for dot dot-dot
 bool dot(const char* s)
 {
     return (s[0] == '.' && (s[1] == '\0' || (s[1] == '.' && s[2] == '\0')));
 }
 
-// ---------------------------------------------------------------------
-// helper function: search all entries in a directory (no recursion yet)
-// ---------------------------------------------------------------------
-bool dircheck(const string& path, const string& target)
-{
-    DIR* dir = opendir(path.c_str());          // try opening directory
-    if (dir == nullptr)                         // if cannot open, skip
-    {
-        return false;
-    }
-
-    struct dirent* entry;
-    while ((entry = readdir(dir)) != nullptr)   // read each entry
-    {
-        if (dot(entry->d_name))    // skip "." and ".."
-        {
-            continue;
-        }
-
-        string name(entry->d_name);             // current entry name
-        if (name == target)                      // check if matches target
-        {
-            closedir(dir);
-            return true;
-        }
-    }
-
-    closedir(dir);                              // close directory
-    return false;                               // not found here
-}
-
-// ---------------------------------------------------------------------
-// main search function: current dir + all subdirectories recursively
-// ---------------------------------------------------------------------
+// search comd
 bool search(const string& target)
 {
-    char cwd[PATH_MAX];                         // buffer to store current dir
-    if (getcwd(cwd, sizeof(cwd)) == nullptr)   // get current working directory
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) == nullptr)
     {
         perror("cannot get cwd");
         return false;
     }
 
-    string base(cwd);                           // convert to string
+    string base(cwd);
 
-    // -----------------------------------------------------------------
-    // first, check current directory itself
-    // -----------------------------------------------------------------
-    if (dircheck(base, target))
-    {
-        return true;
-    }
+    // stack for dfs traversal
+    stack<string> dirs;
+    dirs.push(base);
 
-    // -----------------------------------------------------------------
-    // now, loop through all entries to find subdirectories
-    // -----------------------------------------------------------------
-    DIR* dir = opendir(base.c_str());
-    if (dir == nullptr)
+    while (!dirs.empty())
     {
-        return false;
-    }
+        string current = dirs.top();
+        dirs.pop();
 
-    struct dirent* entry;
-    while ((entry = readdir(dir)) != nullptr)
-    {
-        if (dot(entry->d_name))      // skip "." and ".."
+        DIR* dir = opendir(current.c_str());
+        if (!dir)
         {
             continue;
         }
 
-        if (entry->d_type == DT_DIR)              // only directories
+        struct dirent* entry;
+        while ((entry = readdir(dir)) != nullptr)
         {
-            string newpath = base + "/" + entry->d_name;
+            
+            if (dot(entry->d_name))
+            {
+                continue;
+            } 
 
-            // check target in this subdirectory
-            if (dircheck(newpath, target))
+            string path = current + "/" + entry->d_name;
+
+            // check if it matches the target
+            if (entry->d_type != DT_DIR && entry->d_name == target)
             {
                 closedir(dir);
                 return true;
             }
+
+            // if a directory push it to stack
+            if (entry->d_type == DT_DIR)
+            {
+                dirs.push(path);
+            }
         }
+
+        closedir(dir);
     }
 
-    closedir(dir);
-    return false;                                 // not found
+    return false;
 }

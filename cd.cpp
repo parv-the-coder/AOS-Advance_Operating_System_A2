@@ -1,68 +1,68 @@
 #include "header.h"
 
-// Function to handle 'cd' command
+// cd comand
 void cd(vector<char *> args)
 {
 
-    // Count the number of arguments passed (excluding nullptr)
+    // excluding null pointer count arg
     int argc = 0;
     while (args[argc] != nullptr)
     {
         argc++;
     }
 
-    // Too many arguments check
+    // arguments check
     if (argc > 2)
     {
         cout << "Invalid Arguments for cd\n";
         return;
     }
 
-    // Default target directory
+    // target directory
     string destdir;
 
-    // Case 1: No argument or '~' → go to home directory
+    // no arg or '~' goes home dir
     if (argc == 1 || (argc == 2 && strcmp(args[1], "~") == 0))
     {
         destdir = home_dir;
     }
 
-    // Case 2: Argument is '-' → swap with previous directory
+    // '-' prev dir
     else if (argc == 2 && strcmp(args[1], "-") == 0)
     {
-        destdir = previousDir;
+        destdir = prev_dir;
     }
 
-    // Case 3: Any other argument → treat as path
+    // treat as path
     else if (argc == 2)
     {
         destdir = args[1];
     }
 
-    // Attempt to change directory
+    // change directory
     if (chdir(destdir.c_str()) == -1)
     {
         perror("Error changing directory");
         return;
     }
 
-    // If argument was '-' → print new directory (bash behavior)
+    //  '-' new dir
     if (argc == 2 && strcmp(args[1], "-") == 0)
     {
         cout << destdir << "\n";
     }
 
-    // Update current and previous directories
+    // update curr and prev
     if (!(argc == 2 && strcmp(args[1], "-") == 0))
     {
-        previousDir = currentDir;
+        prev_dir = currdir;
     }
     else
     {
-        swap(previousDir, currentDir);
+        swap(prev_dir, currdir);
     }
 
-    // Always update cur_dir and currentDir
+    // Always update cur_dir and currdir
     getcwd(cur_dir, PATH_MAX);
-    currentDir = cur_dir;
+    currdir = cur_dir;
 }

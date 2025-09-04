@@ -374,3 +374,175 @@ ls | grep ".txt"
 echo hi ; 
 history
 history 5
+echo first; echo second
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+echo first; echo second
+echo first; echo second
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+echo first; echo second
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+echo first; echo second
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+ls -l; pwd
+ls -l; pwd; echo hello
+ls | grep ".txt" > out.txt; cat < in.txt | wc -l > lines.txt
+ls | grep ".txt" > out.txt ; echo hi
+ls | grep ".txt" > out.txt ; echo hi ; cat < out.txt | ec -l > linedsfinal.txt
+cat < in.txt | wc -l > lines.txt
+cat < out.txt | wc -l > lines.txt
+cat < out.txt | wc -l > lines.txt
+clear
+cat < out.txt | wc -l > lines.txt
+cat < out.txt | wc -l > linesssd.txt
+ls | grep ".txt" > out.txt ; echo hi ; cat < out.txt | wc -l > linedsfinal.txt
+cat < out.txt | wc -l > linedsfinal.txt
+ls | grep ".txt" > out.txt ; echo hi ; 
+ls | grep ".txt" > out.txt ; echo hi 
+ls | grep ".txt" > out.txt ; echo hi 
+echo first; echo second;
+echo first; echo second;
+ls | grep ".txt" > out.txt ; echo hi 
+ls | grep ".txt" > out.txt ; echo hi 
+echo first; echo second;
+ls | grep ".txt" > out.txt ; echo hi 
+cat < out.txt | wc -l > linedsfinal.txt
+echo first; echo second;
+cat < out.txt | wc -l > linedsfinal.txt
+ls | grep ".txt" > out.txt ; echo hi ; cat < out.txt | wc -l > linedsfinal.txt
+ls | grep ".txt" > out.txt ; echo hi ; cat < out.txt | wc -l > linedsfinal.txt
+ls | grep ".txt" > out.txt ; echo hi ; cat < out.txt | wc -l > linedsfinal.tx
+echo first; echo second
+echo "Start" ; ls | grep ".txt" > out.txt ; cat < out.txt | wc -l > lines.txt ; echo "Done"
+
+pwd
+cd -
+cd ..
+cd .
+cd ..
+cd -
+cd -
+cd ..
+cd .
+cd
+clear
+ls
+ls -al
+ls -l
+history
+history 100
+echo " heyy sweetie" < cutu.txt
+echo " heyy sweetie" > cutu.txt
+cat < cutu.txt
+echo " heyy sweetie"
+echo " heyy sweetie"
+echo " heyy           sweetie"
+cd ..
+cd ..
+cd .
+cd -
+cd
+pwd
+echo hi < hello.txt
+echo hi > hello.txt
+echo " dasdasdasd              asddasD"
+echo &
+echo                  dasdsadada                       dawsdasdas
+cd -
+cd ..
+cd ..
+cd
+cd -
+cd ~
+cd
+clear
+pwd
+cd a b
+cd /home/parv-shah/Mtech/AOS/Assignments/2025202019_A1
+cd
+pwd
+clear
+ls
+ls -a
+ls -l
+ls -al
+clear
+ls ..
+ls /home/parv-shah/Mtech/AOS/Assignments/2025202019_A1
+ls
+ls history.cpp | wc
+ls history.cpp |wc
+ls history.cpp|wc
+ls ..
+ls ../2025202019_A2 ../2025202019_A1
+clear
+ls -al ../2025202019_A1
+gedit
+gedit &
+pinfo 27944
+pinfo 27944
+clear
+sleep 2 & sleep 2 &
+sleep 2 & 
+sleep 2
+clear
+ls
+search token.o
+search lines_sorted.txt 
+search se.txt
+cat < a.txt 
+sort < history.txt > sorthistory.txt
+cat < sorthistory.txt 
+clear
+cat history.txt
+cat history.txt | wc
+cat history.txt | head -7 | tail -5
+cat | 
+sleep 100
+sleep 100 &
+sleep 100
+cat | |
+search se.txt
+ls ~
+cd ..
+cd
+ls
+pwd
+echo hi
+echo "hi"
+echo "               sadkasmdlkasmdl        asdasdasd "
+ls -a
+ls -al
+ls ..
+ls ~
+cd ~
+ls | grep ".txt" > out.txt
+cleear
+clear
+cat < temp.txt | wc -l > lines.txt
+ls ; wrongcommand ; pwd
+echo "hello" > a.txt ; cat < a.txt ; rm a.txt
+ls | grep ".cpp" ; echo "above are cpp files"
+cd /
+cd
+echo 
+ls asas
+ls ""
+search ""
+pinfo 999
+pinfo -1
+history -5
+history abc
+history 1000
+clear
+cat
+clear
+| ls
+ls || out.txt
+sleep 5 & echo hello
+sleep 5 &
+cat
+cat
+pwd;ls;echo done
+pwd; asad; echo done

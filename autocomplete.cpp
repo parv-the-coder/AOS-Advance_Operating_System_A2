@@ -1,86 +1,73 @@
-#include <dirent.h>            // For directory operations (opendir, readdir, closedir)
-#include <readline/readline.h> // For interactive command-line input
-#include <readline/history.h>  // For command history support
 #include "header.h"
 
-// ==================== BUILT-IN COMMANDS ====================
-// We define a list of commands our shell knows intrinsically.
-// This allows autocompletion to suggest shell-specific commands.
-vector<string> builtin_commands = {"cd", "pwd", "ls", "history", "echo", "pinfo", "search"};
+// list of commands of my shell 
+vector<string> lis_com = {"cd", "pwd", "ls", "history", "echo", "pinfo", "search"};
 
-// ==================== COMMAND GENERATOR ====================
-// This function is called repeatedly by Readline for autocompletion.
-// Each time it is called, it must return the 'state'-th match for the
-// given input prefix 'text'. If there are no more matches, it returns nullptr.
-// The naive approach: we regenerate the match list on every call.
-char *command_generator(const char *text, int state)
+
+// given input prefix 'text' there are no more matches, it returns nullptr.
+char *com_gen(const char *text, int state)
 {
 
-    // 1. Create a local vector for matches (every call recomputes it)
+    // vector for matches
     vector<string> matches;
 
-    // 2. Convert input C-string to C++ string for easier operations
+    // convert for easier operations
     string prefix(text);
-
-    // ---------------- BUILT-IN MATCHING ----------------
-    // We iterate through all built-in commands
-    for (const string &cmd : builtin_commands)
+    
+    // going through all our com
+    for (const string &cmd : lis_com)
     {
-        // Check if the command starts with the user-typed prefix
+        // check command starts with the user prefix
         if (cmd.find(prefix) == 0)
-        { // starts with prefix
-            matches.push_back(cmd);
+        { 
+            matches.push_back(cmd);         // starts with prefix
         }
     }
 
-    // ---------------- DIRECTORY MATCHING ----------------
-    // Open the current directory (".") for reading
+
+    // current dir for reading
     DIR *dir = opendir(".");
     if (dir)
     {
         struct dirent *entry;
 
-        // Iterate over all files and directories
+        // going through all files dir
         while ((entry = readdir(dir)) != nullptr)
         {
-            string fname = entry->d_name; // name of file/directory
-            // If the filename starts with the prefix, add to matches
+
+            string fname = entry->d_name;   // name of file/dir
+
+            // add to matches if file start with pre
             if (fname.find(prefix) == 0)
             {
                 matches.push_back(fname);
             }
         }
-        closedir(dir); // Always close directory after use
+        closedir(dir);
     }
 
-    // ---------------- RETURN THE MATCH BASED ON STATE ----------------
-    // 'state' is an index starting from 0.
-    // For example, first call: state=0 → return first match
-    // Second call: state=1 → return second match, etc.
-    if (state < matches.size())
+    //  nullptr if none left or return match at pos state
+    if (size_t(state )< matches.size())
     {
-        return strdup(matches[state].c_str()); // Return a copy as C-string
+        return strdup(matches[state].c_str());
     }
 
-    // If state >= matches.size(), we have exhausted matches
+    // state is more than match size all are done
     return nullptr;
 }
 
-// ==================== READLINE COMPLETION FUNCTION ====================
-// This function hooks into Readline's autocompletion system.
-// It is called whenever the user presses the TAB key.
-char **my_completion(const char *text, int start, int end)
+
+// tab key is pressed this is called
+char **tab_com(const char *text, int start, int end)
 {
 
-    // If the cursor is at the start of the input, we're completing a command
+    // if start = 0, completing comm
     if (start == 0)
     {
-        rl_attempted_completion_over = 1; // disable default filename completion
-        return rl_completion_matches(text, command_generator);
-        // Readline calls command_generator repeatedly until nullptr is returned
+        rl_attempted_completion_over = 1; // disable default filnam
+        return rl_completion_matches(text, com_gen);   // repeative calls to com_gen until nullptr
     }
-
-    // Otherwise, let Readline handle filename completion for arguments
+    
     rl_attempted_completion_over = 0; // default completion
     return nullptr;
 }

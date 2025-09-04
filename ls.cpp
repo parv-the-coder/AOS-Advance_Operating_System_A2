@@ -9,8 +9,7 @@
 
 using namespace std;
 
-// Returns the type of file as a single character
-// '-' = regular, 'd' = directory, 'l' = symlink, etc.
+// return type of file  single character
 char ftype(mode_t m)
 {
     if (S_ISREG(m))
@@ -47,12 +46,12 @@ char ftype(mode_t m)
     }
 }
 
-// Returns permission string (rwx for user/group/other)
+// returns perm string
 string perm(mode_t m)
 {
     string p = "";
 
-    // User permissions
+    // user perm
     if (m & S_IRUSR)
     {
         p += 'r';
@@ -80,7 +79,7 @@ string perm(mode_t m)
         p += '-';
     }
 
-    // Group permissions
+    // group perm
     if (m & S_IRGRP)
     {
         p += 'r';
@@ -108,7 +107,7 @@ string perm(mode_t m)
         p += '-';
     }
 
-    // Others permissions
+    // other perm
     if (m & S_IROTH)
     {
         p += 'r';
@@ -139,22 +138,22 @@ string perm(mode_t m)
     return p;
 }
 
-// Lists contents of a single directory
-// d = directory path
-// h = show hidden files
-// l = long format
+// list contents of one dir d = dir path h = hidden files l = long format
 void lsdir(const string &d, bool h, bool l)
 {
-    string dir = "";
-    if (d.empty())
+    // use . if no dir is specified
+    string dir;
+    if (d.empty()) 
     {
         dir = ".";
     }
-    else
+    else 
     {
         dir = d;
     }
 
+
+    // open  dir
     DIR *dp = opendir(dir.c_str());
     if (dp == nullptr)
     {
@@ -162,39 +161,35 @@ void lsdir(const string &d, bool h, bool l)
         return;
     }
 
-    vector<string> f;
+    vector<string> f;      // store file names
     struct dirent *e;
 
-    while (true)
+    // read entries in dir
+    while ((e = readdir(dp)) != nullptr)
     {
-        e = readdir(dp);
-        if (e == nullptr)
-        {
-            break;
-        }
-
         string n = e->d_name;
 
-        if (!h)
+        // ignore hidden files if h = false
+        if (!h && n[0] == '.')
         {
-            if (n[0] == '.')
-            {
-                continue;
-            }
+            continue;
         }
 
-        f.push_back(n);
+        f.push_back(n); // add file name to list
     }
 
     closedir(dp);
 
+    // sorting 
     sort(f.begin(), f.end());
 
+    // printing each files
     for (size_t i = 0; i < f.size(); i++)
     {
         string p = dir + "/" + f[i];
         struct stat s;
 
+        // get file info
         if (lstat(p.c_str(), &s) < 0)
         {
             cerr << "error: cannot access '" << p << "'" << endl;
@@ -203,51 +198,40 @@ void lsdir(const string &d, bool h, bool l)
 
         if (l)
         {
-            cout << ftype(s.st_mode);
-            cout << perm(s.st_mode);
+            cout << ftype(s.st_mode);   // file type
+            cout << perm(s.st_mode);    // perm
             cout << "\t";
 
-            cout << s.st_nlink << "\t";
+            cout << s.st_nlink << "\t"; // number of links
 
+            // owner name
             struct passwd *pw = getpwuid(s.st_uid);
-            if (pw != nullptr)
-            {
-                cout << pw->pw_name << "\t";
-            }
-            else
-            {
-                cout << "unknown" << "\t";
-            }
+            cout << (pw ? pw->pw_name : "unknown") << "\t";
 
+            // group name
             struct group *gr = getgrgid(s.st_gid);
-            if (gr != nullptr)
-            {
-                cout << gr->gr_name << "\t";
-            }
-            else
-            {
-                cout << "unknown" << "\t";
-            }
+            cout << (gr ? gr->gr_name : "unknown") << "\t";
 
-            cout << s.st_size << "\t";
-            cout << f[i] << endl;
+            cout << s.st_size << "\t";   // file size
+            cout << f[i] << endl;        // file name
         }
         else
         {
-            cout << f[i] << "\t";
+            cout << f[i] << "\t";   
         }
     }
 
+    // adding newline if not long format
     if (!l)
     {
         cout << endl;
     }
 }
 
-// Main ls command handler for multiple directories
-// dirs = vector of directories
-// h = show hidden files
-// l = long format
+
+
+
+// ls comm
 void ls(vector<string> dirs, bool h, bool l)
 {
     if (dirs.empty())

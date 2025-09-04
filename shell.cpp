@@ -9,46 +9,49 @@ char pre_dir[PATH_MAX];
 char name[256];
 struct passwd *password = getpwuid(getuid());
 
-string currentDir;
-string previousDir;
+string currdir;
+string prev_dir;
 
-// signal handler for ctrl-c
-// sends SIGINT to foreground process
+// ctrl C
 void sigint_handler(int sig)
 {
     if(fg_pid > 0)
     {
         kill(fg_pid, SIGINT); // forward SIGINT to the foreground process
     }
-    cout << "\n";   // move cursor to new line
-    fflush(stdout); // ensure it prints immediately
+
+    cout << "\n";
+    fflush(stdout);
 }
 
-// signal handler for ctrl-z
-// sends SIGTSTP to foreground process
+// ctrl Z
 void sigtstp_handler(int sig)
 {
     if(fg_pid > 0)
     {
         kill(fg_pid, SIGTSTP); // stop the foreground process
-        fflush(stdout);        // flush stdout
+        fflush(stdout);        
     }
 }
 
+
 int main()
 {
-    // set readline autocomplete function
-    rl_attempted_completion_function = my_completion;
 
-    // initialize directories
-    getcwd(cwd, sizeof(cwd));  // current working directory
-    home_dir = cwd;             // save home directory
-    getcwd(cur_dir, PATH_MAX);  // current directory
-    getcwd(pre_dir, PATH_MAX);  // previous directory
+    try 
+    {
+    // setting readline for autocomplete function
+    rl_attempted_completion_function = tab_com;
+
+    // init dir
+    getcwd(cwd, sizeof(cwd));  // curr dir
+    home_dir = cwd;             // save home dir
+    getcwd(cur_dir, PATH_MAX);  // curr dir
+    getcwd(pre_dir, PATH_MAX);  // prev dir
     gethostname(name, sizeof(name)); // host name
     getcwd(cur_dir, sizeof(cur_dir));
-    currentDir = cur_dir;       // current directory string
-    previousDir = cur_dir;      // previous directory string
+    currdir = cur_dir;       
+    prev_dir = cur_dir;      
 
     // register signal handlers
     signal(SIGINT, sigint_handler);    // handle ctrl-c
@@ -56,6 +59,7 @@ int main()
 
     // load history from history file so arrow keys work
     his_load();
+
     string histfile = home_dir + "/history.txt";
     using_history();
     read_history(histfile.c_str());
@@ -63,8 +67,8 @@ int main()
     // main shell loop
     while(true)
     {
-        // build the prompt string
-        string pd = currentDir;  // copy current directory
+        // build the prompt
+        string pd = currdir;  // copy current directory
         if(pd.find(home_dir) == 0)  // replace home path with '~'
         {
             pd.replace(0, home_dir.length(), "~");
@@ -76,20 +80,22 @@ int main()
         const string yellow = "\033[1;33m"; // directory
         const string reset  = "\033[0m";    // reset color
 
-        // final prompt string
+        // final prompt
         string prompt = green + string(password->pw_name) + reset + "@" +
                         blue + string(name) + reset + ":" +
                         yellow + pd + reset + "> ";
 
         // read user input
         char* line = readline(prompt.c_str());
-        if(!line) // if Ctrl-D pressed
+        
+        // if Ctrl-D pressed
+        if(!line) 
         {
             cout << "\nExiting...\n";
             break;
         }
 
-        // copy input safely into global buffer
+        // copy input
         strncpy(input, line, sizeof(input)-1);
         input[sizeof(input)-1] = '\0';
 
@@ -99,57 +105,72 @@ int main()
             add_history(input);               // add to readline history
             append_history(1, histfile.c_str()); // save to file
         }
-        free(line); // free readline buffer
+        free(line);
 
-        // split commands separated by ';'
+        // split comd by ;
         string s_input = input;
-        vector<string> cmds; // store individual commands
+        vector<string> cmds; // store individual comd
         size_t pos = 0;
 
-        // manual split to avoid strtok (different flow)
+        // split
         while((pos = s_input.find(";")) != string::npos)
         {
-            string t = s_input.substr(0, pos); // extract command
-            cmds.push_back(t);                 // add to command list
-            s_input.erase(0, pos + 1);         // remove processed part
+            string t = s_input.substr(0, pos); // extract comd
+            cmds.push_back(t);                 // add comd list
+            s_input.erase(0, pos + 1);        
         }
-        if(!s_input.empty()) cmds.push_back(s_input); // add remaining
 
-        // iterate over each command
+        if(!s_input.empty()) 
+        {
+            cmds.push_back(s_input); // add others
+        }
+        
+        // go through each comd
         for(auto &cmdline : cmds)
         {
-            // trim whitespace from command
-            char* cptr = strdup(cmdline.c_str());
-            cptr = trim(cptr);
-            if(strlen(cptr) == 0) { free(cptr); continue; } // skip empty
+            char* orig = strdup(cmdline.c_str());
+            char* cptr = trim(orig);               
+            
+            if(strlen(cptr) == 0)
+            {
+                free(cptr);
+                continue; 
+            }
 
             string temp = cptr;
 
-            // check if command contains pipe '|'
+            // check if pipe | present
             if(temp.find("|") != string::npos)
             {
-                // split piped commands
+                // split piped comd
                 vector<char*> parts = splitpipe(cptr);
                 vector<vector<char*>> piped;
 
-                // tokenize each part by space
+                // tokenize by space
                 for(size_t i = 0; i < parts.size(); i++)
                 {
                     piped.push_back(token(parts[i], " "));
                 }
 
-                // execute piped commands
+                // execute piped comd
                 pipeline(piped, piped.size());
             }
             else
             {
-                // single command execution
                 executeCommand(cptr);
             }
 
-            free(cptr); // free temporary buffer
+            free(orig);
         }
     }
-
+    }
+    catch(const std::exception& e)
+    {
+        cerr << "Unknown error occurred: " << e.what() << "\n";
+    }
+    catch(...)
+    {
+        cerr << "Unknown error occurred\n";
+    }
     return 0;
 }

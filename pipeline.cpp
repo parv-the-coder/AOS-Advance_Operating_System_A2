@@ -2,44 +2,65 @@
 
 
 // execute a single command with input/output redirection
-void runpipe(vector<char*> args, int inputfd, int outputfd) {
+void runpipe(vector<char*> args, int inputfd, int outputfd) 
+{
     pid_t pid = fork();
-    if (pid == 0) { // child process
-        if (inputfd != STDIN_FILENO) {
+    
+    // child
+    if (pid == 0)
+    { 
+        if (inputfd != STDIN_FILENO) 
+        {
             dup2(inputfd, STDIN_FILENO);
             close(inputfd);
         }
-        if (outputfd != STDOUT_FILENO) {
+
+        if (outputfd != STDOUT_FILENO) 
+        {
             dup2(outputfd, STDOUT_FILENO);
             close(outputfd);
         }
 
-        if (execvp(args[0], args.data()) == -1) {
+        if (execvp(args[0], args.data()) == -1) 
+        {
             perror("execvp failed");
             exit(EXIT_FAILURE);
         }
-    } else if (pid < 0) {
+
+    }
+    else if (pid < 0) 
+    {
         perror("fork failed");
         exit(EXIT_FAILURE);
     }
 }
 
 
-// split input line by '|' into multiple commands
-vector<char*> splitpipe(char *line) {
+// split input line by | into multi com
+vector<char*> splitpipe(char *line) 
+{
     vector<char*> cmds;
     char *cmd = strtok(line, "|");
 
-    while (cmd != nullptr) {
-        // remove leading spaces
-        while (*cmd && isspace((unsigned char)*cmd)) cmd++;
+    while (cmd != nullptr) 
+    {
+        // removing spaces leading
+        while (*cmd && isspace((unsigned char)*cmd))
+        {
+            cmd++;
+        } 
 
-        // remove trailing spaces
+        // remove  spaces trailing
         char *end = cmd + strlen(cmd) - 1;
-        while (end > cmd && isspace((unsigned char)*end)) end--;
+        while (end > cmd && isspace((unsigned char)*end))
+        {
+            end--;
+        }
+
         *(end + 1) = '\0';
 
-        if (*cmd != '\0') {
+        if (*cmd != '\0') 
+        {
             cmds.push_back(cmd);
         }
 
@@ -50,92 +71,98 @@ vector<char*> splitpipe(char *line) {
 }
 
 
-// execute multiple piped commands
-int pipeline(vector<vector<char*>> cmds, int n) {
-    int num = cmds.size();
-    if (num == 0) return 1;
+// execute multi piped comm
+void pipeline(vector<vector<char*>> &piped, int n)
+{
+    int in_fd = 0;
+    int fd[2];
 
-    int inputfd = STDIN_FILENO;
-    vector<pid_t> children;
-
-    for (int i = 0; i < num; i++) {
-        int pipefd[2];
-        int outputfd;
-
-        // create pipe if not last command
-        if (i < num - 1) {
-            if (pipe(pipefd) == -1) {
+    for (int i = 0; i < n; i++)
+    {
+        // create pipe]
+        if (i < n - 1) 
+        {
+            if (pipe(fd) < 0)
+            {
                 perror("pipe failed");
-                exit(EXIT_FAILURE);
-            }
-            outputfd = pipefd[1];
-        } else {
-            outputfd = STDOUT_FILENO;
-        }
-
-        // handle output redirection in last command
-        if (i == num - 1) {
-            for (size_t j = 0; cmds[i][j] != nullptr; j++) {
-                if (strcmp(cmds[i][j], ">") == 0) {
-                    outputfd = open(cmds[i][j+1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                    cmds[i].erase(cmds[i].begin() + j, cmds[i].begin() + j + 2);
-                    break;
-                }
-                if (strcmp(cmds[i][j], ">>") == 0) {
-                    outputfd = open(cmds[i][j+1], O_WRONLY | O_CREAT | O_APPEND, 0644);
-                    cmds[i].erase(cmds[i].begin() + j, cmds[i].begin() + j + 2);
-                    break;
-                }
+                return;
             }
         }
 
-        // handle input redirection in first command
-        if (i == 0) {
-            for (size_t j = 0; cmds[i][j] != nullptr; j++) {
-                if (strcmp(cmds[i][j], "<") == 0) {
-                    inputfd = open(cmds[i][j+1], O_RDONLY);
-                    cmds[i].erase(cmds[i].begin() + j, cmds[i].begin() + j + 2);
-                    break;
-                }
-            }
-        }
-
-        // fork and execute
         pid_t pid = fork();
-        if (pid == 0) { // child
-            if (inputfd != STDIN_FILENO) {
-                dup2(inputfd, STDIN_FILENO);
-                close(inputfd);
-            }
-            if (outputfd != STDOUT_FILENO) {
-                dup2(outputfd, STDOUT_FILENO);
-                close(outputfd);
-            }
-
-            if (execvp(cmds[i][0], cmds[i].data()) == -1) {
-                perror("execvp failed");
-                exit(EXIT_FAILURE);
-            }
-        } else if (pid < 0) {
+        if (pid < 0)
+        {
             perror("fork failed");
-            exit(EXIT_FAILURE);
-        } else { // parent
-            children.push_back(pid);
+            return;
+        }
 
-            if (inputfd != STDIN_FILENO) close(inputfd);
-            if (outputfd != STDOUT_FILENO) close(outputfd);
-
-            if (i < num - 1) {
-                inputfd = pipefd[0];
+        // child
+        if (pid == 0) 
+        {
+            
+            if (in_fd != 0)
+            {
+                dup2(in_fd, 0);
+                close(in_fd);
             }
+
+            // stdout next pipe if not last command
+            if (i < n - 1)
+            {
+                close(fd[0]);
+                dup2(fd[1], 1);
+                close(fd[1]);
+            }
+
+            // handling redir
+            bool redirectFlag = false;
+            for (char* a : piped[i])
+            {
+                if (!a)
+                {
+                    break;
+                }
+
+                if (strcmp(a, "<") == 0 || strcmp(a, ">") == 0 || strcmp(a, ">>") == 0)
+                {
+                    redirectFlag = true;
+                    break;
+                }
+            }
+
+            if (redirectFlag)
+            {
+                redir(piped[i], home_dir);
+                exit(0);
+            }
+
+            // execute normal command
+            execvp(piped[i][0], piped[i].data());
+            perror("execvp failed");
+            exit(1);
+        }
+
+        // parent
+        else
+        {
+            waitpid(pid, nullptr, 0);
+
+            // close write end in parent
+            if (i < n - 1)
+            {
+                close(fd[1]);
+            }
+
+            // next command reads from previous pipe
+            if (in_fd != 0)
+            {
+                close(in_fd);
+            }
+            if (i < n - 1)
+            {
+                 in_fd = fd[0];
+            }
+              
         }
     }
-
-    // wait for all children to finish
-    for (size_t i = 0; i < children.size(); i++) {
-        int status;
-        waitpid(children[i], &status, 0);
-    }
-
-    return 1;
 }

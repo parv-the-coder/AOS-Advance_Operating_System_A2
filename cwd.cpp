@@ -2,14 +2,14 @@
 
 void pwd(int arg_count)
 {
-    // check number of arguments
+    // check arg count
     if (arg_count > 1)
     {
         cerr << "Too many arguments for pwd\n";
         return;
     }
 
-    // buffer to store current directory path
+    // buffer for storing cur dir path
     char cwd_buff[PATH_MAX];
 
     // getcwd returns nullptr on error
@@ -17,6 +17,7 @@ void pwd(int arg_count)
     {
         cout << cwd_buff << endl;
     }
+    
     else
     {
         perror("PWD error");
