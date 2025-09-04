@@ -1,138 +1,71 @@
-// #include <bits/stdc++.h>
-// #include <unistd.h>
-// #include <fcntl.h>
-// #include <sys/wait.h>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <dirent.h>
+#include"header.h"
 
-// using namespace std;
+void pinfo(pid_t pid) {
+    // Paths to /proc files for the given PID
+    char stat_path[256], exe_path[256];
+    sprintf(stat_path, "/proc/%d/stat", pid);  // file containing process info
+    sprintf(exe_path, "/proc/%d/exe", pid);    // symlink to executable
 
-// void printProcessInfo(pid_t pid) 
-// {
-//     if (pid == 0) {
-//         pid = getpid();  // default: current process
-//     }
-
-//     char statPath[256], exePath[256];
-//     sprintf(statPath, "/proc/%d/stat", pid);
-//     sprintf(exePath, "/proc/%d/exe", pid);
-
-//     // Reading process status from /proc/[pid]/stat
-//     ifstream statFile(statPath);
-//     if (!statFile) {
-//         perror("pinfo");
-//         return;
-//     }
-
-//     string line, comm, state;
-//     long rss = 0;
-//     int field = 1;
-
-//     getline(statFile, line);
-//     statFile.close();
-
-//     istringstream iss(line);
-//     string token;
-//     while (iss >> token) {
-//         if (field == 2) comm = token;       // command name
-//         else if (field == 3) state = token; // process state
-//         else if (field == 24) rss = stol(token); // RSS
-//         field++;
-//     }
-
-//     // Strip parentheses around comm
-//     if (comm.size() > 2 && comm.front() == '(' && comm.back() == ')') {
-//         comm = comm.substr(1, comm.size() - 2);
-//     }
-
-//     // Get the executable path
-//     char exeRealPath[PATH_MAX];
-//     ssize_t len = readlink(exePath, exeRealPath, sizeof(exeRealPath) - 1);
-//     if (len != -1) exeRealPath[len] = '\0';
-//     else strcpy(exeRealPath, "N/A");
-
-//     // Convert memory from pages to KB
-//     long pageSize = sysconf(_SC_PAGESIZE) / 1024;  
-//     long memory = rss * pageSize;  
-
-//     // Output
-//     cout << "pid -- " << pid << endl;
-//     cout << "Process Name -- " << comm << endl;
-//     cout << "Process Status -- " << state << endl;
-//     cout << "memory -- " << memory << " KB" << endl;
-//     cout << "Executable Path -- " << exeRealPath << endl;
-// }
-
-#include <bits/stdc++.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include "global.h"
-
-using namespace std;
-
-void printProcessInfo(pid_t pid) 
-{
-    if (pid == 0) {
-        pid = getpid();  // default: current process
-    }
-
-    char statPath[256], exePath[256];
-    sprintf(statPath, "/proc/%d/stat", pid);
-    sprintf(exePath, "/proc/%d/exe", pid);
-
-    // Reading process status from /proc/[pid]/stat
-    ifstream statFile(statPath);
-    if (!statFile) {
-        perror("pinfo");
+    // Open the stat file in read-only mode
+    int fd = open(stat_path, O_RDONLY);
+    if (fd == -1) { // check if process exists
+        printf("Error: Process with PID %d does not exist.\n", pid);
         return;
     }
 
-    string line, comm, state;
-    long rss = 0;
-    int field = 1;
+    // Read the content of the stat file into a buffer
+    char buffer[4096];
+    int n = read(fd, buffer, sizeof(buffer) - 1); // leave space for null terminator
+    close(fd); // always close file descriptor to avoid leaks
 
-    getline(statFile, line);
-    statFile.close();
+    if (n <= 0) { // error reading the file
+        printf("Error reading process info.\n");
+        return;
+    }
+    buffer[n] = '\0'; // null-terminate the buffer to safely treat as string
 
-    istringstream iss(line);
-    string token;
-    while (iss >> token) {
-        if (field == 2) comm = token;       // command name
-        else if (field == 3) state = token; // process state
-        else if (field == 24) {
-            try { rss = stol(token); } catch(...) { rss = 0; }
-        }
+    // Variables to hold extracted info
+    char *p = buffer;          // pointer for manual parsing
+    char comm[256] = {0};      // process name
+    char state = '?';           // process state
+    long rss = 0;               // resident set size (memory)
+
+    // Extract command name (process name) which is between parentheses
+    char *start = strchr(p, '(');    // first '('
+    char *end = strrchr(p, ')');     // last ')'
+    if (start && end && end > start) {
+        strncpy(comm, start + 1, end - start - 1); // copy name inside parentheses
+        comm[end - start - 1] = '\0';              // null-terminate
+        p = end + 2; // move pointer past ") " to start of next fields
+    }
+
+    // Extract process state: the single character right after ')'
+    if (*p) state = *p;
+
+    // Extract memory info (resident set size)
+    // This is the 24th field in /proc/[pid]/stat
+    int field = 3;           // we already read comm and state
+    char *token = strtok(p, " "); // split remaining string by spaces
+    while (token) {
+        if (field == 24) rss = atol(token); // convert RSS from string to long
         field++;
+        token = strtok(nullptr, " "); // get next field
     }
 
-    // Strip parentheses around comm
-    if (comm.size() > 2 && comm.front() == '(' && comm.back() == ')') {
-        comm = comm.substr(1, comm.size() - 2);
-    }
-
-    // Get the executable path
-    char exeRealPath[PATH_MAX];
-    ssize_t len = readlink(exePath, exeRealPath, sizeof(exeRealPath) - 1);
-    if (len != -1) exeRealPath[len] = '\0';
-    else strcpy(exeRealPath, "N/A");
+    // Get executable path using readlink on /proc/[pid]/exe
+    char exe_real[PATH_MAX];
+    ssize_t len = readlink(exe_path, exe_real, sizeof(exe_real) - 1);
+    if (len != -1) exe_real[len] = '\0'; // null-terminate if valid
+    else strcpy(exe_real, "N/A");         // if invalid, show N/A
 
     // Convert memory from pages to KB
-    long pageSize = sysconf(_SC_PAGESIZE) / 1024;  
-    long memory = rss * pageSize;  
+    long page_size = sysconf(_SC_PAGESIZE) / 1024; // 1 page in KB
+    long memory = rss * page_size;                  // total memory in KB
 
-    // Add '+' if pid matches current foreground process
-    string stateWithPlus = state;
-    if (pid == fg_pid) stateWithPlus += "+";
-
-    // Output
-    cout << "pid -- " << pid << endl;
-    cout << "Process Name -- " << comm << endl;
-    cout << "Process Status -- " << stateWithPlus << endl;
-    cout << "memory -- " << memory << " KB" << endl;
-    cout << "Executable Path -- " << exeRealPath << endl;
+    // Print process info in the requested format
+    printf("pid -- %d\n", pid);
+    printf("Process Name -- %s\n", comm);
+    printf("Process Status -- %c\n", state);
+    printf("memory -- %ld KB\n", memory);
+    printf("Executable Path -- %s\n", exe_real);
 }

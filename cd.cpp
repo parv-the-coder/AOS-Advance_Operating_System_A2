@@ -1,65 +1,68 @@
-#include<bits/stdc++.h>
-#include<unistd.h>
-#include<pwd.h>
-#include <sys/wait.h>
-using namespace std;
-extern char cwd[PATH_MAX];
-extern string currentDir;
-extern string previousDir;
-extern string  home_dir;
-extern char cur_dir[PATH_MAX];
-extern char pre_dir[PATH_MAX];
+#include "header.h"
 
+// Function to handle 'cd' command
+void cd(vector<char *> args)
+{
 
-void cd_func(vector<char*> args) {
-    // int n = args.size() - 1;   // args includes nullptr at end
-    int n = 0;
-    for (; args[n] != nullptr; ++n);  // count arguments excluding nullptr
+    // Count the number of arguments passed (excluding nullptr)
+    int argc = 0;
+    while (args[argc] != nullptr)
+    {
+        argc++;
+    }
 
-    if (n > 2) {
-        cout << "Invalid Arguments for cd" << "\n";
+    // Too many arguments check
+    if (argc > 2)
+    {
+        cout << "Invalid Arguments for cd\n";
         return;
     }
 
-    // Case 1: cd OR cd ~
-    if (n == 1 || (n == 2 && strcmp(args[1], "~") == 0)) {
-        if (chdir(home_dir.c_str()) == -1) {
-            perror("Error");
-            return;
-        }
+    // Default target directory
+    string destdir;
+
+    // Case 1: No argument or '~' → go to home directory
+    if (argc == 1 || (argc == 2 && strcmp(args[1], "~") == 0))
+    {
+        destdir = home_dir;
+    }
+
+    // Case 2: Argument is '-' → swap with previous directory
+    else if (argc == 2 && strcmp(args[1], "-") == 0)
+    {
+        destdir = previousDir;
+    }
+
+    // Case 3: Any other argument → treat as path
+    else if (argc == 2)
+    {
+        destdir = args[1];
+    }
+
+    // Attempt to change directory
+    if (chdir(destdir.c_str()) == -1)
+    {
+        perror("Error changing directory");
+        return;
+    }
+
+    // If argument was '-' → print new directory (bash behavior)
+    if (argc == 2 && strcmp(args[1], "-") == 0)
+    {
+        cout << destdir << "\n";
+    }
+
+    // Update current and previous directories
+    if (!(argc == 2 && strcmp(args[1], "-") == 0))
+    {
         previousDir = currentDir;
-        getcwd(cur_dir, PATH_MAX);
-        currentDir = cur_dir;
-        return;
+    }
+    else
+    {
+        swap(previousDir, currentDir);
     }
 
-    // Case 2: cd <path> (not -)
-    else if (n == 2 && strcmp(args[1], "-") != 0) {
-        if (chdir(args[1]) == -1) {
-            perror("No Such Directory or File exists");
-            return;
-        }
-        previousDir = currentDir;
-        getcwd(cur_dir, PATH_MAX);
-        currentDir = cur_dir;
-        return;
-    }
-
-else if (n == 2 && strcmp(args[1], "-") == 0) {
-    if (chdir(previousDir.c_str()) == -1) {
-        perror("No such directory or file exists");
-        return;
-    }
-    string temp = currentDir;
-    currentDir = previousDir;
-    previousDir = temp;
+    // Always update cur_dir and currentDir
     getcwd(cur_dir, PATH_MAX);
-    cout << currentDir << "\n";   // bash-like behaviour
-    return;
-}
-// fallback
-else {
-    cout << "Invalid Arguments for cd" << "\n";
-}
-
+    currentDir = cur_dir;
 }

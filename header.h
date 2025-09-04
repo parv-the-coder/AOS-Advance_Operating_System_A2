@@ -1,10 +1,18 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#include <bits/stdc++.h>
-#include <unistd.h>
-#include <pwd.h>
-#include <sys/types.h>
+#include <bits/stdc++.h>   // all standard C++ headers
+#include <unistd.h>         // system calls
+#include <pwd.h>            // user info
+#include <sys/types.h>      // system types
+#include <dirent.h>         // directory traversal
+#include <sys/stat.h>       // file info
+#include <grp.h>            // group info
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 using namespace std;
 
@@ -20,37 +28,39 @@ extern string currentDir;
 extern string previousDir;
 extern pid_t fg_pid;
 
+void executeCommand(char* cmd);
+
 
 // ---------------- echo.cpp ----------------
 void echo(char input[4096]);
 
 // ---------------- ls.cpp ----------------
-string filePermissions(mode_t mode);
-void listDirectoryContents(const string &directoryPath, bool showHidden, bool longFormat);
-void lsCommand(vector<string> paths, bool showHidden, bool longFormat);
+string perm(mode_t m);
+void lsdir(const string &d, bool h, bool l);
+void ls(vector<string> dirs, bool h, bool l);
 
 // ---------------- history.cpp ----------------
-void load_history_file();
-void save_history(const string &cmd);
-void print_history(int n = 10);
+void his_load();
+void his_save(const string &cmd);
+void his_print(int n = 10);
 
 // ---------------- pipeline.cpp ----------------
-vector<char*> execute_piped_commands(char *line);
-void execute_command(vector<char*> args, int input_fd, int output_fd);
-int execute_pipeline(vector<vector<char*>> commands);
+vector<char*> splitpipe(char *line);
+void runpipe(vector<char*> args, int input_fd, int output_fd);
+int pipeline(vector<vector<char*>> commands,int n);
 
 // ---------------- procinfo.cpp ----------------
-void printprocinfo(pid_t pid);
+void pinfo(pid_t pid);
 
 // ---------------- prompt.cpp ----------------
 void display();
 
 // ---------------- redir.cpp ----------------
-void execute_command_with_redirection(vector<char*> args, string &home_dir);
+void redir(vector<char*> args, string &home_dir);
 
 // ---------------- search.cpp ----------------
-bool recursiveSearch(const string& directory, const string& target);
-bool searchInCurrentDirectory(const string& target);
+bool dircheck(const string& directory, const string& target);
+bool search(const string& target);
 
 // ---------------- shell.cpp helpers ----------------
 void execom(char* cmd);
@@ -65,7 +75,7 @@ vector<char*> token(char* str, const char* delimiter);
 char* command_generator(const char* text, int state);
 char** my_completion(const char* text, int start, int end);
 
-void cd_func(std::vector<char*> args);
+void cd(std::vector<char*> args);
 void pwd(int arg);
 
 void printProcessInfo(pid_t pid);
@@ -73,5 +83,11 @@ void printProcessInfo(pid_t pid);
 void executeCommand(char* cmd) ;
 // ---------------- completion ----------------
 char** my_completion(const char* text, int start, int end);
+
+
+// ---------------- foreground/background functions ----------------
+int foreground(vector<char*>& args);
+int background(vector<char*>& args);
+
 
 #endif // HEADER_H

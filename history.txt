@@ -60,3 +60,317 @@ clear
 cd /home/parv-shah/Mtech/AOS/Assignments/2025202019_A2/testing/sd
 cd -
 cd ~
+cd ~
+pinfo 
+cd test
+cd..
+cd ..
+cd .
+cd -
+cd test
+cd .
+cd .
+cd
+cd ..
+cd .
+cd -
+cd -
+cd
+cd .
+cd ~
+pwd
+pwd
+clear
+cd
+echo helloo     fuck
+echo "hello"
+./shell
+clear
+cd
+echo hello
+echo hi
+echo hi
+echo hi
+echo heellooo hiii
+echoo               nik
+echo    dd 
+echo         ddd                dddddddddd
+ dddddddddd
+echo hi    heelo
+echo hi
+echo hi     hi
+echo hello < outputed.txt
+echo hello < outputed.txt
+echo hello < output
+echo hi > outputed.txt
+clear
+echo hi hello
+echo hi   hello
+echo
+echo hello < outputed.txt
+echo hello < outputed.txt
+echo hello > outputed.txt
+echo hello < newtesr.txt
+echo hello > newtesr.txt
+echo hello < newtesr.txt
+echo hello < nr.txt
+echo hello > nr.txt
+clear
+echo come > tesdsd.txt
+echo hi
+echo hello hi      thanks
+echo comwdlkasnmdalskfnk < qwkemqwlkme.txt
+echo comwdlkasnmdalskfnk > qwkemqwlkme.txt
+echo hello
+echo hii           heeel
+echo hjii < dkasdl.txt
+echo hjii >  dkasdl.txt
+history
+history 5
+history 100
+clear
+ls
+ls -a
+ls -l
+ls ~
+ls ..
+ls -al
+ls
+ls -a
+ls -l
+ls -al
+ls .
+ls ..
+ls ~
+ls
+ls -a
+ls -al
+ls -l
+ls | grep txt
+ls -l | grep txt | wc -l
+pinfo
+pinfo
+ls -l | grep txt | wc -l
+pinfo
+pinfo
+echo "existing line" > tput.txt
+echo "existing line" > sadatput.txt
+echo "existing line" > sadatput.txt
+echo "existing line" > atput.txt
+cat < missing.txt
+cat < testfiles/input.txt
+
+cat < testfiles/input.txt
+echo "existing line" > atpusasdt.txt
+cat < atpusasdt.txt
+echo "existing line" > sadatput.txt
+echo "existing line" > sadatpucoolt.txt
+echo "existing line" > cool.txt
+echo "existing line" > cool.txt
+echo "existing line" > cool.txt
+echo "existing line" > cool.txt
+echo hello < sd.txt
+echo hello > sd.txt
+search file1.txt
+search file.txt
+search searc
+se.txt
+search se.txt
+cd
+cd -
+cd ..
+cd .
+cd ..
+cd
+ls
+ls -a
+ls -l
+echo hello
+echo hii > tar.txt
+ls -l
+echo "hey cutie"
+sleep 30&
+sleep 30 &
+sleep 30
+pinfo 15307
+sleep 30&
+clear
+ls
+pwd
+echo hello
+sleep 5 &
+sleep 10 &
+pinfo 25940
+pinfo
+pinfo
+echo hello
+pinfo
+sleep 10 &
+pinfo 27716
+pinfo
+ls
+ls -al
+cleear
+clear
+echo "hello" ""world"
+echo "hello" ""world"
+echo     Aos                Assignment               2
+pwd
+ls
+ls -a
+ls -l
+ls -al
+ls .
+ls ..
+cd
+cd test
+cd ..
+cd -
+gedit &
+pinfo
+pinfo 28765
+search file.txt
+search lines.txt
+cd
+search lines.txt
+echo cooll >> tar.txt
+cat << tar.txt
+cat < tar.txt
+cat lines.txt
+cd testing/
+cat lines.txt
+cat lines.txt| wc
+ls | grep “.txt” > out.txt; cat < in.txt | wc -l > lines.txt
+
+ls | grep “.txt” > out.txt; cat < in.txt | wc -l > lines.txt
+ls | grep ".txt"  > out.txt; cat < in.txt | wc -l > lines.txt
+ls | grep ".txt"  > out.txt; cat < cool.txt | wc -l > lines.txt
+history
+history 45
+clear
+ls | grep ".txt"  > out.txt; cat < cool.txt | wc -l > lines.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+grep.txt
+grep ".txt"
+ls
+ls | grep ".txt"
+ls | grep ".txt"
+grep ".txt"
+ls | grep ".txt"
+ls | grep ".txt"
+ls | grep ".txt"
+ls | grep ".txt"
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt" 
+ls | grep ".txt" 
+ls | grep ".txt" 
+ls | grep ".txt" 
+ls | grep ".txt"  > out.txt; cat < a.txt | wc -l > lineds.txt
+ls | grep ".txt"  > out.txt; cat < a.txt
+ls | grep ".txt"  > out.txt
+ls | grep ".txt"  > out.txt; cat < a.txt
+pwd
+cd ..
+pwd
+cd ~
+pwd
+echo Hello World
+ls
+ls -a
+ls -l
+ls test_dir
+ls -al test_dir
+ls -la test_dir
+sleep 2
+sleep 3 &
+pinfo
+pinfo 12345
+search file1.txt
+search file_not_exist.txt
+echo "Hello Redirection" > a.txt
+cat < a.txt
+cat < a.txt | wc -l > lines.txt
+cat lines.txt | grep Hello
+cat lines.txt | grep Hello | wc -l
+echo first; echo second; echo third
+echo first; echo second; echo third
+cat lines.txt | grep Hello | wc -l
+pwd
+pwd
+echo hello
+pwd
+echo hello
+search file1.txt
+pwd
+cd ..
+pwd
+cd ~
+pwd
+echo Hello World
+ls
+ls -a
+ls -l
+ls test_dir
+ls -al test_dir
+ls -la test_dir
+sleep 2
+sleep 3 &
+pinfo
+pinfo 12345
+search file1.txt
+search file_not_exist.txt
+echo "Hello Redirection" > a.txt
+cat < a.txt
+cat < a.txt | wc -l > lines.txt
+cat lines.txt | grep Hello
+cat lines.txt | grep Hello | wc -l
+echo first; echo second; echo third
+ls | grep ".txt"
+sleep 5 &
+sleep 5 &
+pinfo 44669
+sleep 100 &
+pinfo 44670
+pinfo
+c
+echo "hello" "" world"
+echo aos           asadasd
+pwd
+ls
+ls -a
+ls -al
+ls ..
+cd test
+cd ..
+cd testing/
+cd sd/
+cd .
+cd ..
+cd ~
+cd -
+cd
+gedit &
+pinfo 44945
+search file1.txt
+echo cool >> lines.txt
+cat lines.txt
+sort < lines.txt > lines_sorted.txt
+sort < lines.txt > lines_sorted.txt
+cat < lines_sorted.txt
+cat lines_sorted.txt | wc
+cat lines.txt | head -3 | tail -2
+ls | grep “.txt” > out.txt; cat < in.txt | wc -l > lines.txt
+
+ls | grep ".txt"
+echo hi ; 
+history
+history 5

@@ -1,112 +1,272 @@
-#include <iostream>
-#include <dirent.h>
+#include "header.h"
 #include <sys/stat.h>
-#include <unistd.h>
-#include <cstring>
-#include <vector>
-#include <grp.h>
+#include <dirent.h>
 #include <pwd.h>
-#include <ctime>
-#include <iomanip>
+#include <grp.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
-#include"header.h"
-// Helper: Convert file type + permissions to string
-string filePermissions(mode_t mode) {
-    string perms = "";
-
-    // File type
-    if (S_ISREG(mode)) perms += '-';
-    else if (S_ISDIR(mode)) perms += 'd';
-    else if (S_ISLNK(mode)) perms += 'l';
-    else if (S_ISCHR(mode)) perms += 'c';
-    else if (S_ISBLK(mode)) perms += 'b';
-    else if (S_ISFIFO(mode)) perms += 'p';
-    else if (S_ISSOCK(mode)) perms += 's';
-    else perms += '?';
-
-    // User permissions
-    perms += (mode & S_IRUSR) ? 'r' : '-';
-    perms += (mode & S_IWUSR) ? 'w' : '-';
-    perms += (mode & S_IXUSR) ? 'x' : '-';
-
-    // Group permissions
-    perms += (mode & S_IRGRP) ? 'r' : '-';
-    perms += (mode & S_IWGRP) ? 'w' : '-';
-    perms += (mode & S_IXGRP) ? 'x' : '-';
-
-    // Others permissions
-    perms += (mode & S_IROTH) ? 'r' : '-';
-    perms += (mode & S_IWOTH) ? 'w' : '-';
-    perms += (mode & S_IXOTH) ? 'x' : '-';
-
-    return perms;
+// Returns the type of file as a single character
+// '-' = regular, 'd' = directory, 'l' = symlink, etc.
+char ftype(mode_t m)
+{
+    if (S_ISREG(m))
+    {
+        return '-';
+    }
+    else if (S_ISDIR(m))
+    {
+        return 'd';
+    }
+    else if (S_ISLNK(m))
+    {
+        return 'l';
+    }
+    else if (S_ISCHR(m))
+    {
+        return 'c';
+    }
+    else if (S_ISBLK(m))
+    {
+        return 'b';
+    }
+    else if (S_ISFIFO(m))
+    {
+        return 'p';
+    }
+    else if (S_ISSOCK(m))
+    {
+        return 's';
+    }
+    else
+    {
+        return '?';
+    }
 }
 
-// List directory contents
-void listDirectoryContents(const string &directoryPath, bool showHidden, bool longFormat) {
-    DIR *directory = opendir(directoryPath.empty() ? "." : directoryPath.c_str());
-    if (!directory) {
-        cerr << "Cannot access " << directoryPath << ": No such directory" << endl;
+// Returns permission string (rwx for user/group/other)
+string perm(mode_t m)
+{
+    string p = "";
+
+    // User permissions
+    if (m & S_IRUSR)
+    {
+        p += 'r';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    if (m & S_IWUSR)
+    {
+        p += 'w';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    if (m & S_IXUSR)
+    {
+        p += 'x';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    // Group permissions
+    if (m & S_IRGRP)
+    {
+        p += 'r';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    if (m & S_IWGRP)
+    {
+        p += 'w';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    if (m & S_IXGRP)
+    {
+        p += 'x';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    // Others permissions
+    if (m & S_IROTH)
+    {
+        p += 'r';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    if (m & S_IWOTH)
+    {
+        p += 'w';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    if (m & S_IXOTH)
+    {
+        p += 'x';
+    }
+    else
+    {
+        p += '-';
+    }
+
+    return p;
+}
+
+// Lists contents of a single directory
+// d = directory path
+// h = show hidden files
+// l = long format
+void lsdir(const string &d, bool h, bool l)
+{
+    string dir = "";
+    if (d.empty())
+    {
+        dir = ".";
+    }
+    else
+    {
+        dir = d;
+    }
+
+    DIR *dp = opendir(dir.c_str());
+    if (dp == nullptr)
+    {
+        cerr << "error: cannot open '" << dir << "'" << endl;
         return;
     }
 
-    vector<string> names;
-    struct dirent *entry;
-    while ((entry = readdir(directory)) != nullptr) {
-        string name = entry->d_name;
-        if (!showHidden && name[0] == '.') continue;
-        names.push_back(name);
+    vector<string> f;
+    struct dirent *e;
+
+    while (true)
+    {
+        e = readdir(dp);
+        if (e == nullptr)
+        {
+            break;
+        }
+
+        string n = e->d_name;
+
+        if (!h)
+        {
+            if (n[0] == '.')
+            {
+                continue;
+            }
+        }
+
+        f.push_back(n);
     }
 
-    closedir(directory);
+    closedir(dp);
 
-    // Sort alphabetically
-    sort(names.begin(), names.end());
+    sort(f.begin(), f.end());
 
-    for (const auto &name : names) {
-        string fullPath = directoryPath + "/" + name;
-        struct stat fileStat;
-        if (lstat(fullPath.c_str(), &fileStat) < 0) {
-            perror("stat");
+    for (size_t i = 0; i < f.size(); i++)
+    {
+        string p = dir + "/" + f[i];
+        struct stat s;
+
+        if (lstat(p.c_str(), &s) < 0)
+        {
+            cerr << "error: cannot access '" << p << "'" << endl;
             continue;
         }
 
-        if (longFormat) {
-            string perms = filePermissions(fileStat.st_mode);
-            struct passwd *pw = getpwuid(fileStat.st_uid);
-            struct group *gr = getgrgid(fileStat.st_gid);
+        if (l)
+        {
+            cout << ftype(s.st_mode);
+            cout << perm(s.st_mode);
+            cout << "\t";
 
-            // Format modification time
-            char timebuf[80];
-            struct tm *tm_info = localtime(&fileStat.st_mtime);
-            strftime(timebuf, sizeof(timebuf), "%b %d %H:%M", tm_info);
+            cout << s.st_nlink << "\t";
 
-            cout << perms << "\t";
-            cout << fileStat.st_nlink << "\t";
-            cout << (pw ? pw->pw_name : "unknown") << "\t";
-            cout << (gr ? gr->gr_name : "unknown") << "\t";
-            cout << fileStat.st_size << "\t";
-            cout << timebuf << "\t";
-            cout << name << endl;
-        } else {
-            cout << name << "\t";
+            struct passwd *pw = getpwuid(s.st_uid);
+            if (pw != nullptr)
+            {
+                cout << pw->pw_name << "\t";
+            }
+            else
+            {
+                cout << "unknown" << "\t";
+            }
+
+            struct group *gr = getgrgid(s.st_gid);
+            if (gr != nullptr)
+            {
+                cout << gr->gr_name << "\t";
+            }
+            else
+            {
+                cout << "unknown" << "\t";
+            }
+
+            cout << s.st_size << "\t";
+            cout << f[i] << endl;
+        }
+        else
+        {
+            cout << f[i] << "\t";
         }
     }
 
-    if (!longFormat) cout << endl;
+    if (!l)
+    {
+        cout << endl;
+    }
 }
 
-// Main ls command handler
-void lsCommand(vector<string> paths, bool showHidden, bool longFormat) {
-    if (paths.empty()) paths.push_back(".");
+// Main ls command handler for multiple directories
+// dirs = vector of directories
+// h = show hidden files
+// l = long format
+void ls(vector<string> dirs, bool h, bool l)
+{
+    if (dirs.empty())
+    {
+        dirs.push_back(".");
+    }
 
-    for (size_t i = 0; i < paths.size(); i++) {
-        if (paths.size() > 1) {
-            cout << paths[i] << ":" << endl;
+    for (size_t i = 0; i < dirs.size(); i++)
+    {
+        if (dirs.size() > 1)
+        {
+            cout << dirs[i] << ":" << endl;
         }
-        listDirectoryContents(paths[i], showHidden, longFormat);
-        if (i != paths.size() - 1) cout << endl;
+
+        lsdir(dirs[i], h, l);
+
+        if (i != dirs.size() - 1)
+        {
+            cout << endl;
+        }
     }
 }

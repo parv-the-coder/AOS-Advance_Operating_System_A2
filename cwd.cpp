@@ -1,50 +1,25 @@
-// #include<bits/stdc++.h>
-// #include<unistd.h>
-// #include<pwd.h>
-// #include <sys/wait.h>
-// using namespace std;
+#include "header.h"
 
-// void pwd(int arg)
-// {
-//     if(arg>1)
-//     {
-//         perror("Invalid Arguments for pwd");
-//         return;
-//     }
-    
-//     char prewordir[PATH_MAX];
-//     getcwd(prewordir,PATH_MAX);
-
-//     if(prewordir!=nullptr)
-//     {
-//         cout<<prewordir<<endl;
-//     }
-    
-//     else
-//     {
-//         perror("Error in PWD: ");
-//         return;
-//     }
-// }
-
-#include <bits/stdc++.h>
-#include <unistd.h>
-#include <pwd.h>
-#include <sys/wait.h>
-using namespace std;
-
-void pwd(int arg)
+void pwd(int arg_count)
 {
-    if(arg>1)
+    // check number of arguments
+    if (arg_count > 1)
     {
-        cerr << "Invalid Arguments for pwd" << "\n";
+        cerr << "Too many arguments for pwd\n";
         return;
     }
-    
-    char prewordir[PATH_MAX];
-    if (getcwd(prewordir, PATH_MAX) != nullptr) {
-        cout << prewordir << endl;
-    } else {
-        perror("Error in PWD");
+
+    // buffer to store current directory path
+    char cwd_buff[PATH_MAX];
+
+    // getcwd returns nullptr on error
+    if (getcwd(cwd_buff, sizeof(cwd_buff)) != nullptr)
+    {
+        cout << cwd_buff << endl;
     }
+    else
+    {
+        perror("PWD error");
+    }
+
 }
