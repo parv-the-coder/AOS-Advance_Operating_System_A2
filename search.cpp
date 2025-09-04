@@ -94,26 +94,3 @@ bool search(const string& target)
     closedir(dir);
     return false;                                 // not found
 }
-
-// ---------------------------------------------------------------------
-// example usage (uncomment for testing)
-// ---------------------------------------------------------------------
-// int main(int argc, char* argv[])
-// {
-//     if (argc != 2)
-//     {
-//         printf("usage: %s <filename>\n", argv[0]);
-//         return 1;
-//     }
-//
-//     string target = argv[1];
-//     if (search(target))
-//     {
-//         printf("true\n");
-//     }
-//     else
-//     {
-//         printf("false\n");
-//     }
-//     return 0;
-// }
